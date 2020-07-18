@@ -46,7 +46,7 @@ GraphRenderer::GraphRenderer()
     glLinkProgram(m_defaultShader);
 }
 
-void GraphRenderer::handleInput()
+void GraphRenderer::handleInput() const
 {
     // If Escape Key is pressed
     if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -54,7 +54,7 @@ void GraphRenderer::handleInput()
     }
 }
 
-void GraphRenderer::drawTriangle(std::vector<double>& vertices)
+void GraphRenderer::drawTriangle(const std::vector<double>& vertices) const
 {
 
     glBindVertexArray(m_vertexArrayObj);
@@ -73,38 +73,38 @@ void GraphRenderer::drawTriangle(std::vector<double>& vertices)
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-void GraphRenderer::draw(std::unordered_map<Node*, std::vector<Edge>> nodes)
+void GraphRenderer::draw(const std::unordered_map<Node*, std::vector<Edge>> nodes)
 {
 
     m_scaleMatrix = glm::mat4(1.0f);
-    m_scaleMatrix = glm::scale(m_scaleMatrix, glm::vec3(0.9f, 0.9f, 0.9f));
+    m_scaleMatrix = glm::scale(m_scaleMatrix, glm::vec3(0.8f, 0.8f, 0.8f));
     m_scaleMatrix = glm::translate(m_scaleMatrix, glm::vec3(-4.5f, -4.5f, 0.0f));
 
     Shader::setUniformMat4("scaleTransform", m_defaultShader, m_scaleMatrix);
-    Shader::setUniformMat4("projection", m_defaultShader, glm::ortho(-7.0f, 7.0f, -4.5f, 4.5f, -1.0f, 1.0f));
+    Shader::setUniformMat4("projection", m_defaultShader, glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, -1.0f, 1.0f));
 
 
-    auto getCoordinates = [&](auto node) {
+    const auto getCoordinates = [&](const auto node) {
         return std::make_tuple<double>(node->X(), node->Y());
     };
 
-    for (auto& [node, edges] : nodes) {
-        auto [x, y] = getCoordinates(node);
+    for (const auto& [node, edges] : nodes) {
+        const auto [x, y] = getCoordinates(node);
         drawNode(x, y);
-        for (auto& edge : edges) {
+        for (const auto& edge : edges) {
 
-            auto getFromNode = edge.getFromNode();
-            auto getToNode   = edge.getToNode();
+            const auto getFromNode = edge.getFromNode();
+            const auto getToNode   = edge.getToNode();
 
-            auto [sx, sy] = getCoordinates(&getFromNode);
-            auto [fx, fy] = getCoordinates(&getToNode);
+            const auto [sx, sy] = getCoordinates(&getFromNode);
+            const auto [fx, fy] = getCoordinates(&getToNode);
 
             drawLine(sx, sy, fx, fy);
         }
     }
 }
 
-void GraphRenderer::drawNode(double x, double y)
+void GraphRenderer::drawNode(const double x, const double y) const
 {
 
     std::vector<double> firstTriangle;
@@ -127,7 +127,7 @@ void GraphRenderer::drawNode(double x, double y)
     drawTriangle(secondTriangle);
 }
 
-void GraphRenderer::drawLine(double startX, double startY, double endX, double endY)
+void GraphRenderer::drawLine(const double startX, const double startY, const double endX, const double endY) const
 {
 
     const std::array<double, 6> vertices = { startX, startY, 0.0, endX, endY, 0.0 };

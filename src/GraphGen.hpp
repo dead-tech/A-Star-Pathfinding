@@ -16,11 +16,9 @@
 
 class Graph {
 public:
-    Graph(std::size_t graphWidth);
+    Graph(const std::size_t graphWidth);
 
-    const std::unordered_map<Node*, std::vector<Edge>> getGraph() const { return m_graphRepr; }
-    void                                               setStartNode(Node node);
-    void                                               setEndNode(Node node);
+    [[nodiscard]] const std::unordered_map<Node*, std::vector<Edge>> getGraph() const { return m_graphRepr; }
 
 private:
     std::unordered_map<Node*, std::vector<Edge>> m_graphRepr;

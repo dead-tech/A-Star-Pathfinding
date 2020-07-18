@@ -10,7 +10,7 @@ public:
     {
     }
 
-    Edge(Node fromNode, Node toNode)
+    Edge(const Node fromNode, const Node toNode)
         : m_fromNode(fromNode)
         , m_toNode(toNode)
     {

@@ -21,8 +21,8 @@
 
 class GraphRenderer {
 private:
-    int         m_windowWidth  = 1400;
-    int         m_windowHeight = 900;
+    const int   m_windowWidth  = 800;
+    const int   m_windowHeight = 800;
     const char* m_windowTitle  = "A Star Pathfinding";
 
     unsigned int m_vertexArrayObj;
@@ -30,7 +30,7 @@ private:
 
     unsigned int m_defaultShader;
 
-    const std::vector<double> m_offsets {
+    const std::array<double, 15> m_offsets {
         -0.25f, -0.25f, 0.0f, //a
         -0.25f, 0.25f, 0.0f,  //b
         0.25f, 0.25f, 0.0f,   //c
@@ -50,11 +50,11 @@ public:
     GLFWwindow* m_window;
     GraphRenderer();
     ~GraphRenderer();
-    void drawTriangle(std::vector<double>& vertices);
-    void handleInput();
-    void draw(std::unordered_map<Node*, std::vector<Edge>> nodes);
-    void drawNode(double x, double y);
-    void drawLine(double startX, double startY, double endX, double endY);
+    void drawTriangle(const std::vector<double>& vertices) const;
+    void handleInput() const;
+    void draw(const std::unordered_map<Node*, std::vector<Edge>> nodes);
+    void drawNode(const double x, const double y) const;
+    void drawLine(const double startX, const double startY, const double endX, const double endY) const;
 };
 
 #endif

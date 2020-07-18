@@ -28,7 +28,7 @@ public:
     }
 
 
-    [[nodiscard]] std::string readShader()
+    [[nodiscard]] const std::string readShader()
     {
         std::ifstream fileHandler;
         fileHandler.open(m_filepath);
@@ -44,21 +44,21 @@ public:
         return "";
     }
 
-    [[nodiscard]] unsigned int compileShader(const bool isVertex)
+    [[nodiscard]] const unsigned int compileShader(const bool isVertex)
     {
         const char* temp          = m_shaderSource.c_str();
-        auto        compileShader = [&](auto id) {
+        auto        compileShader = [&](const auto id) {
             m_shader = id;
             glShaderSource(id, 1, &temp, nullptr);
             glCompileShader(id);
         };
 
         if (isVertex) {
-            unsigned int vertexId = glCreateShader(GL_VERTEX_SHADER);
+            const unsigned int vertexId = glCreateShader(GL_VERTEX_SHADER);
             compileShader(vertexId);
             return vertexId;
         } else {
-            unsigned int fragmentId = glCreateShader(GL_FRAGMENT_SHADER);
+            const unsigned int fragmentId = glCreateShader(GL_FRAGMENT_SHADER);
             compileShader(fragmentId);
             return fragmentId;
         }
