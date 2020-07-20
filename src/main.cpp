@@ -8,7 +8,7 @@ int main()
 {
     const std::size_t graphDim = 10;
     Graph             graph { graphDim };
-    GraphRenderer     renderer {};
+    GraphRenderer     renderer { &graph };
 
 
     while (!glfwWindowShouldClose(renderer.m_window)) {
@@ -16,7 +16,7 @@ int main()
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        renderer.draw(graph.getGraph());
+        renderer.draw();
 
         glfwSwapBuffers(renderer.m_window);
         glfwPollEvents();
