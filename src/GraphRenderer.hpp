@@ -33,11 +33,12 @@ private:
     glm::mat4 m_proj;
 
 
-    const std::array<double, 9> m_firstTriangle {
-        -0.25f, -0.25f, 0.0f, //a
-        -0.25f, 0.25f, 0.0f,  //b
-        0.25f, 0.25f, 0.0f,   //c
-    };
+    const std::array<double, 9>
+        m_firstTriangle {
+            -0.25f, -0.25f, 0.0f, //a
+            -0.25f, 0.25f, 0.0f,  //b
+            0.25f, 0.25f, 0.0f,   //c
+        };
 
     const std::array<double, 9> m_secondTriangle {
         0.25f, 0.25f, 0.0f,   //c
@@ -64,6 +65,7 @@ public:
     void      draw();
     void      drawNode(const double x, const double y);
     void      drawLine(const double startX, const double startY, const double endX, const double endY) const;
+    glm::vec2 rayCastCoords();
     glm::vec4 toWorldCoords(glm::vec4 ndcCoords) const;
 };
 

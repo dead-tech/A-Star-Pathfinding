@@ -49,37 +49,21 @@ GraphRenderer::GraphRenderer(Graph* graph)
 
 void GraphRenderer::handleInput()
 {
+
     // If Escape Key is pressed
     if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+
         glfwSetWindowShouldClose(m_window, true);
-    }
 
-    //On Left Click -> RayCasting
-    if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
+    } else if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
 
-        double mouseX;
-        double mouseY;
-        glfwGetCursorPos(m_window, &mouseX, &mouseY);
+        auto coords = rayCastCoords();
+        m_graph->setStartNode(coords.x, coords.y);
 
-        float ndcX;
-        float ndcY;
-        ndcX          = (2.0f * mouseX) / 800 - 1.0f;
-        ndcY          = 1.0f - (2.0f * mouseY) / 800;
-        glm::vec4 ndc = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+    } else if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) {
 
-        auto worldCoords = glm::vec3(toWorldCoords(ndc));
-        worldCoords      = glm::normalize(worldCoords);
-
-        auto t = -15.0f / worldCoords.z;
-
-        auto finalX = 4.5f + t * worldCoords.x;
-        auto finalY = 4.5f + t * worldCoords.y;
-
-        auto node = m_graph->findNode(finalX, finalY);
-
-        if (node != nullptr) {
-            node->m_isStartNode = true;
-        }
+        auto coords = rayCastCoords();
+        m_graph->setEndNode(coords.x, coords.y);
     }
 }
 
@@ -112,10 +96,30 @@ void GraphRenderer::draw()
         const auto [x, y] = getCoordinates(node);
 
         if (node->m_isStartNode) {
+
+            Shader::setUniformBool("endNode", m_defaultShader, false);
             Shader::setUniformBool("startNode", m_defaultShader, true);
+
             drawNode(x, y);
-        } else {
+
             Shader::setUniformBool("startNode", m_defaultShader, false);
+
+
+        } else if (node->m_isEndNode) {
+
+            Shader::setUniformBool("startNode", m_defaultShader, false);
+            Shader::setUniformBool("endNode", m_defaultShader, true);
+
+            drawNode(x, y);
+
+            Shader::setUniformBool("endNode", m_defaultShader, false);
+
+
+        } else {
+
+            Shader::setUniformBool("endNode", m_defaultShader, false);
+            Shader::setUniformBool("startNode", m_defaultShader, false);
+
             drawNode(x, y);
         }
 
@@ -177,6 +181,29 @@ void GraphRenderer::drawLine(const double startX, const double startY, const dou
     glUseProgram(m_defaultShader);
     glBindVertexArray(m_vertexArrayObj);
     glDrawArrays(GL_LINES, 0, 2);
+}
+
+glm::vec2 GraphRenderer::rayCastCoords()
+{
+    double mouseX;
+    double mouseY;
+    glfwGetCursorPos(m_window, &mouseX, &mouseY);
+
+    float ndcX;
+    float ndcY;
+    ndcX          = (2.0f * mouseX) / 800 - 1.0f;
+    ndcY          = 1.0f - (2.0f * mouseY) / 800;
+    glm::vec4 ndc = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+
+    auto worldCoords = glm::vec3(toWorldCoords(ndc));
+    worldCoords      = glm::normalize(worldCoords);
+
+    auto t = -15.0f / worldCoords.z;
+
+    auto finalX = 4.5f + t * worldCoords.x;
+    auto finalY = 4.5f + t * worldCoords.y;
+
+    return glm::vec2(finalX, finalY);
 }
 
 glm::vec4 GraphRenderer::toWorldCoords(glm::vec4 ndcCoords) const

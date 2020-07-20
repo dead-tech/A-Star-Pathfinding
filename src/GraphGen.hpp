@@ -23,9 +23,14 @@ public:
 
     [[nodiscard]] const std::unordered_map<Node*, std::vector<Edge>>& getGraph() const { return m_graphRepr; }
 
-    Node* findNode(float x, float y) const;
+    [[nodiscard]] Node* findNode(float x, float y) const;
 
-    Node& operator[](unsigned int index)
+    void setStartNode(float x, float y) const;
+
+    void setEndNode(float x, float y) const;
+
+
+    [[nodiscard]] Node& operator[](unsigned int index)
     {
         return m_graphNodes.at(index);
     }

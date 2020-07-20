@@ -60,3 +60,42 @@ Node* Graph::findNode(float x, float y) const
 
     return nullptr;
 }
+
+void Graph::setStartNode(float x, float y) const
+{
+
+    auto isStartNode = [&](std::pair<Node*, std::vector<Edge>> map) {
+        return map.first->m_isStartNode;
+    };
+
+    auto match = std::find_if(begin(m_graphRepr), end(m_graphRepr), isStartNode);
+
+    if (match != m_graphRepr.end()) {
+        match->first->m_isStartNode = false;
+    }
+
+    auto node = findNode(x, y);
+    if (node != nullptr) {
+        node->m_isEndNode   = false;
+        node->m_isStartNode = true;
+    }
+}
+
+void Graph::setEndNode(float x, float y) const
+{
+    auto isEndNode = [&](std::pair<Node*, std::vector<Edge>> map) {
+        return map.first->m_isEndNode;
+    };
+
+    auto match = std::find_if(begin(m_graphRepr), end(m_graphRepr), isEndNode);
+
+    if (match != m_graphRepr.end()) {
+        match->first->m_isEndNode = false;
+    }
+
+    auto node = findNode(x, y);
+    if (node != nullptr) {
+        node->m_isStartNode = false;
+        node->m_isEndNode   = true;
+    }
+}
