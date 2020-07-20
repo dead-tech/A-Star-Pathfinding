@@ -62,7 +62,7 @@ public:
     void      draw(const std::unordered_map<Node*, std::vector<Edge>> nodes);
     void      drawNode(const double x, const double y);
     void      drawLine(const double startX, const double startY, const double endX, const double endY) const;
-    glm::vec4 toWorldCoords(glm::vec4 ndcCoords);
+    glm::vec4 toWorldCoords(glm::vec4 ndcCoords) const;
 };
 
 #endif

@@ -52,6 +52,30 @@ void GraphRenderer::handleInput() const
     if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(m_window, true);
     }
+
+    //On Left Click -> RayCasting
+    if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
+
+        double mouseX;
+        double mouseY;
+        glfwGetCursorPos(m_window, &mouseX, &mouseY);
+
+        float ndcX;
+        float ndcY;
+        ndcX          = (2.0f * mouseX) / 800 - 1.0f;
+        ndcY          = 1.0f - (2.0f * mouseY) / 800;
+        glm::vec4 ndc = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+
+        auto worldCoords = glm::vec3(toWorldCoords(ndc));
+        worldCoords      = glm::normalize(worldCoords);
+
+        auto t = -15.0f / worldCoords.z;
+
+        auto finalX = 4.5f + t * worldCoords.x;
+        auto finalY = 4.5f + t * worldCoords.y;
+
+        //fmt::print("{}, {}\n", finalX, finalY);
+    }
 }
 
 void GraphRenderer::drawTriangle(const std::array<double, 9>& vertices) const
@@ -75,15 +99,6 @@ void GraphRenderer::drawTriangle(const std::array<double, 9>& vertices) const
 
 void GraphRenderer::draw(const std::unordered_map<Node*, std::vector<Edge>> nodes)
 {
-
-    //m_scaleMatrix    = glm::mat4(1.0f);
-    //auto scaleFactor = 1.0f;
-    //m_scaleMatrix    = glm::scale(m_scaleMatrix, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
-    //m_scaleMatrix    = glm::translate(m_scaleMatrix, glm::vec3(-4.5f, -4.5f, 0.0f));
-
-    ////Shader::setUniformMat4("scaleTransform", m_defaultShader, m_scaleMatrix);
-
-
     const auto getCoordinates = [&](const auto node) {
         return std::make_tuple<double>(node->X(), node->Y());
     };
@@ -150,16 +165,13 @@ void GraphRenderer::drawLine(const double startX, const double startY, const dou
     glDrawArrays(GL_LINES, 0, 2);
 }
 
-glm::vec4 GraphRenderer::toWorldCoords(glm::vec4 ndcCoords)
+glm::vec4 GraphRenderer::toWorldCoords(glm::vec4 ndcCoords) const
 {
 
     auto eye = glm::inverse(m_proj) * ndcCoords;
     eye      = glm::vec4(eye.x, eye.y, -1.0f, 0.0f);
 
     return glm::inverse(m_view) * eye;
-
-    //return glm::inverse(m_proj * m_view) * ndcCoords;
-    //return glm::unProject(glm::vec3(ndcCoords), m_view, m_proj, glm::vec4(0, 0, m_windowWidth, m_windowHeight));
 }
 
 GraphRenderer::~GraphRenderer()
