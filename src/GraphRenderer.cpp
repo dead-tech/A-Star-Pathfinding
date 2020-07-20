@@ -54,7 +54,7 @@ void GraphRenderer::handleInput() const
     }
 }
 
-void GraphRenderer::drawTriangle(const std::vector<double>& vertices) const
+void GraphRenderer::drawTriangle(const std::array<double, 9>& vertices) const
 {
 
     glBindVertexArray(m_vertexArrayObj);
@@ -76,12 +76,12 @@ void GraphRenderer::drawTriangle(const std::vector<double>& vertices) const
 void GraphRenderer::draw(const std::unordered_map<Node*, std::vector<Edge>> nodes)
 {
 
-    m_scaleMatrix = glm::mat4(1.0f);
-    m_scaleMatrix = glm::scale(m_scaleMatrix, glm::vec3(0.8f, 0.8f, 0.8f));
-    m_scaleMatrix = glm::translate(m_scaleMatrix, glm::vec3(-4.5f, -4.5f, 0.0f));
+    //m_scaleMatrix    = glm::mat4(1.0f);
+    //auto scaleFactor = 1.0f;
+    //m_scaleMatrix    = glm::scale(m_scaleMatrix, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
+    //m_scaleMatrix    = glm::translate(m_scaleMatrix, glm::vec3(-4.5f, -4.5f, 0.0f));
 
-    Shader::setUniformMat4("scaleTransform", m_defaultShader, m_scaleMatrix);
-    Shader::setUniformMat4("projection", m_defaultShader, glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, -1.0f, 1.0f));
+    ////Shader::setUniformMat4("scaleTransform", m_defaultShader, m_scaleMatrix);
 
 
     const auto getCoordinates = [&](const auto node) {
@@ -104,27 +104,25 @@ void GraphRenderer::draw(const std::unordered_map<Node*, std::vector<Edge>> node
     }
 }
 
-void GraphRenderer::drawNode(const double x, const double y) const
+void GraphRenderer::drawNode(const double x, const double y)
 {
+    auto scaleFactor = 1;
 
-    std::vector<double> firstTriangle;
+    m_model = glm::mat4(1.0f);
+    m_model = glm::scale(m_model, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
+    m_model = glm::translate(m_model, glm::vec3(x, y, 0.0f));
 
-    for (std::size_t i = 0; i < 3; i++) {
-        firstTriangle.push_back(x + m_offsets[3 * i]);
-        firstTriangle.push_back(y + m_offsets[3 * i + 1]);
-        firstTriangle.push_back(m_offsets[3 * i + 2]);
-    }
+    m_view = glm::lookAt(glm::vec3(4.5f, 4.5f, 15.0f), glm::vec3(4.5f, 4.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    std::vector<double> secondTriangle;
+    m_proj = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 
-    for (std::size_t i = 2; i < 5; i++) {
-        secondTriangle.push_back(x + m_offsets[3 * i]);
-        secondTriangle.push_back(y + m_offsets[3 * i + 1]);
-        secondTriangle.push_back(m_offsets[3 * i + 2]);
-    }
 
-    drawTriangle(firstTriangle);
-    drawTriangle(secondTriangle);
+    Shader::setUniformMat4("model", m_defaultShader, m_model);
+    Shader::setUniformMat4("view", m_defaultShader, m_view);
+    Shader::setUniformMat4("proj", m_defaultShader, m_proj);
+
+    drawTriangle(m_firstTriangle);
+    drawTriangle(m_secondTriangle);
 }
 
 void GraphRenderer::drawLine(const double startX, const double startY, const double endX, const double endY) const
@@ -143,9 +141,25 @@ void GraphRenderer::drawLine(const double startX, const double startY, const dou
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    auto model = glm::mat4(1.0f);
+
+    Shader::setUniformMat4("model", m_defaultShader, model);
+
     glUseProgram(m_defaultShader);
     glBindVertexArray(m_vertexArrayObj);
     glDrawArrays(GL_LINES, 0, 2);
+}
+
+glm::vec4 GraphRenderer::toWorldCoords(glm::vec4 ndcCoords)
+{
+
+    auto eye = glm::inverse(m_proj) * ndcCoords;
+    eye      = glm::vec4(eye.x, eye.y, -1.0f, 0.0f);
+
+    return glm::inverse(m_view) * eye;
+
+    //return glm::inverse(m_proj * m_view) * ndcCoords;
+    //return glm::unProject(glm::vec3(ndcCoords), m_view, m_proj, glm::vec4(0, 0, m_windowWidth, m_windowHeight));
 }
 
 GraphRenderer::~GraphRenderer()
