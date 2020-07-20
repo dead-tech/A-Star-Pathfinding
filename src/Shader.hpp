@@ -69,6 +69,11 @@ public:
         return glGetUniformLocation(program, name.c_str());
     }
 
+    static void setUniformBool(const std::string& name, unsigned int program, const bool boolean)
+    {
+        glUniform1i(getUniform(name, program), boolean);
+    }
+
     static void setUniformMat4(const std::string& name, unsigned int program, glm::mat4 matrix)
     {
         glUniformMatrix4fv(getUniform(name, program), 1, GL_FALSE, glm::value_ptr(matrix));
