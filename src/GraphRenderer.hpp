@@ -15,6 +15,7 @@
 #include "Shader.hpp"
 #include "Edge.hpp"
 #include "Node.hpp"
+#include "GraphGen.hpp"
 
 class GraphRenderer {
 private:
@@ -54,12 +55,13 @@ private:
 
 public:
     GLFWwindow* m_window;
+    Graph*      m_graph;
 
-    GraphRenderer();
+    GraphRenderer(Graph* graph);
     ~GraphRenderer();
     void      drawTriangle(const std::array<double, 9>& vertices) const;
-    void      handleInput() const;
-    void      draw(const std::unordered_map<Node*, std::vector<Edge>> nodes);
+    void      handleInput();
+    void      draw();
     void      drawNode(const double x, const double y);
     void      drawLine(const double startX, const double startY, const double endX, const double endY) const;
     glm::vec4 toWorldCoords(glm::vec4 ndcCoords) const;

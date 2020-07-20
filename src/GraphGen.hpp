@@ -7,7 +7,10 @@
 #include <algorithm>
 #include <unordered_map>
 #include <time.h>
+#include <memory>
 
+#define FMT_HEADER_ONLY
+#include <fmt/format.h>
 
 // My headers
 #include "Node.hpp"
@@ -18,7 +21,14 @@ class Graph {
 public:
     Graph(const std::size_t graphWidth);
 
-    [[nodiscard]] const std::unordered_map<Node*, std::vector<Edge>> getGraph() const { return m_graphRepr; }
+    [[nodiscard]] const std::unordered_map<Node*, std::vector<Edge>>& getGraph() const { return m_graphRepr; }
+
+    Node* findNode(float x, float y) const;
+
+    Node& operator[](unsigned int index)
+    {
+        return m_graphNodes.at(index);
+    }
 
 private:
     std::unordered_map<Node*, std::vector<Edge>> m_graphRepr;

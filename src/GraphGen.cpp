@@ -15,6 +15,7 @@ Graph::Graph(const std::size_t graphWidth)
         }
     }
 
+    srand(time(NULL));
 
     m_graphRepr = std::unordered_map<Node*, std::vector<Edge>>();
 
@@ -44,4 +45,18 @@ Graph::Graph(const std::size_t graphWidth)
         neighbours.clear();
         edges.clear();
     }
+}
+
+Node* Graph::findNode(float x, float y) const
+{
+    for (auto [node, edges] : m_graphRepr) {
+        const auto resultX = std::abs(x - node->X());
+        const auto resultY = std::abs(y - node->Y());
+
+        if ((resultX >= 0 && resultX < 0.25) && (resultY >= 0 && resultY < 0.25)) {
+            return node;
+        }
+    }
+
+    return nullptr;
 }

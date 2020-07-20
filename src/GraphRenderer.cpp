@@ -1,7 +1,8 @@
 #include "GraphRenderer.hpp"
 
 
-GraphRenderer::GraphRenderer()
+GraphRenderer::GraphRenderer(Graph* graph)
+    : m_graph(graph)
 {
     if (!glfwInit()) {
         fmt::print("glfw3 failed to initialize!");
@@ -46,7 +47,7 @@ GraphRenderer::GraphRenderer()
     glLinkProgram(m_defaultShader);
 }
 
-void GraphRenderer::handleInput() const
+void GraphRenderer::handleInput()
 {
     // If Escape Key is pressed
     if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -74,7 +75,11 @@ void GraphRenderer::handleInput() const
         auto finalX = 4.5f + t * worldCoords.x;
         auto finalY = 4.5f + t * worldCoords.y;
 
-        //fmt::print("{}, {}\n", finalX, finalY);
+        auto node = m_graph->findNode(finalX, finalY);
+
+        if (node != nullptr) {
+            node->m_isStartNode = true;
+        }
     }
 }
 
@@ -97,15 +102,24 @@ void GraphRenderer::drawTriangle(const std::array<double, 9>& vertices) const
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-void GraphRenderer::draw(const std::unordered_map<Node*, std::vector<Edge>> nodes)
+void GraphRenderer::draw()
 {
     const auto getCoordinates = [&](const auto node) {
         return std::make_tuple<double>(node->X(), node->Y());
     };
 
-    for (const auto& [node, edges] : nodes) {
+    for (const auto& [node, edges] : m_graph->getGraph()) {
         const auto [x, y] = getCoordinates(node);
-        drawNode(x, y);
+
+        if (node->m_isStartNode) {
+            Shader::setUniformBool("startNode", m_defaultShader, true);
+            drawNode(x, y);
+        } else {
+            Shader::setUniformBool("startNode", m_defaultShader, false);
+            drawNode(x, y);
+        }
+
+
         for (const auto& edge : edges) {
 
             const auto getFromNode = edge.getFromNode();
