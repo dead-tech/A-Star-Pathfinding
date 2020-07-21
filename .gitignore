@@ -423,5 +423,6 @@ MigrationBackup/
 /build/glfw3.dll
 /include
 src/glad.c
+glslValidator/
 TODO
 # End of https://www.toptal.com/developers/gitignore/api/windows,c++,visualstudio

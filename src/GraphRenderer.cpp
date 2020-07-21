@@ -35,10 +35,10 @@ GraphRenderer::GraphRenderer(Graph* graph)
     glGenVertexArrays(1, &m_vertexArrayObj);
     glGenBuffers(1, &m_vertexBufferObj);
 
-    Shader vertexShader { "assets/shaders/vertexShader.glsl" };
+    Shader vertexShader { "assets/shaders/vertexShader.vert" };
     auto   vertexShaderID = vertexShader.compileShader(true);
 
-    Shader fragmentShader { "assets/shaders/fragmentShader.glsl" };
+    Shader fragmentShader { "assets/shaders/fragmentShader.frag" };
     auto   fragmentShaderID = fragmentShader.compileShader(false);
 
     m_defaultShader = glCreateProgram();
