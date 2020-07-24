@@ -38,15 +38,15 @@ public:
     {
     }
 
-    [[nodiscard]] constexpr bool operator==(const Node& rhs) const
+    [[nodiscard]] bool operator==(const Node& rhs) const
     {
         return (this->X() == rhs.X() && this->Y() == rhs.Y());
     }
 
-    [[nodiscard]] constexpr double X() const { return m_nodeCoordinates.X(); }
-    [[nodiscard]] constexpr double Y() const { return m_nodeCoordinates.Y(); }
+    [[nodiscard]] double X() const { return m_nodeCoordinates.X(); }
+    [[nodiscard]] double Y() const { return m_nodeCoordinates.Y(); }
 
-    [[nodiscard]] constexpr bool isWalkable() const { return m_walkable; }
+    [[nodiscard]] bool isWalkable() const { return m_walkable; }
 
 
 private:

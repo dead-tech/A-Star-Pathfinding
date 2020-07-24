@@ -1,6 +1,5 @@
 #define FMT_HEADER_ONLY
 #include <fmt/format.h>
-
 #include "GraphGen.hpp"
 #include "GraphRenderer.hpp"
 
@@ -21,6 +20,7 @@ int main()
         glfwSwapBuffers(renderer.m_window);
         glfwPollEvents();
     }
+
 
     return 0;
 }
