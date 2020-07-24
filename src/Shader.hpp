@@ -3,6 +3,7 @@
 
 #define FMT_HEADER_ONLY
 #include <fmt/format.h>
+#define __NODISCARD [[nodiscard]]
 
 #include <string>
 #include <sstream>
@@ -19,52 +20,66 @@ public:
         : m_filepath(filepath)
 
     {
+        if (m_filepath.empty()) {
+            fmt::print("Invalid path to shader!\nError: {}", m_filepath);
+            throw std::exception("Invalid path to shader!");
+        }
+
         m_shaderSource = readShader();
     }
 
-    ~Shader()
-    {
-        glDeleteShader(m_shader);
-    }
-
-
-    [[nodiscard]] const std::string readShader()
+    __NODISCARD const std::string readShader() const
     {
         std::ifstream fileHandler;
         fileHandler.open(m_filepath);
 
-        if (fileHandler.is_open()) {
+        if (fileHandler.good()) {
+
             std::stringstream sstream;
             sstream << fileHandler.rdbuf();
+
             fileHandler.close();
+
             return sstream.str();
         } else {
-            fmt::print("Unable to open file at filepath: {}", m_filepath);
+            fmt::print("Unable to open file at filepath!\nError: {}", m_filepath);
+            const std::string errorMessage { "Unable to open file at filepath:" + m_filepath };
+            throw std::exception(errorMessage.c_str());
         }
-        return "";
     }
 
-    [[nodiscard]] const unsigned int compileShader(const bool isVertex)
+    __NODISCARD const unsigned int compileShader(const bool isVertex)
     {
-        const char* temp          = m_shaderSource.c_str();
-        auto        compileShader = [&](const auto id) {
+        const char* temp = m_shaderSource.c_str();
+
+        const auto compileShader = [&](const auto id) {
             m_shader = id;
             glShaderSource(id, 1, &temp, nullptr);
             glCompileShader(id);
+
+            int success;
+            glGetShaderiv(id, GL_COMPILE_STATUS, &success);
+
+            if (!success) {
+                fmt::print("Failed to compile shader!\n");
+                throw std::exception("Failed to compile shader!");
+            }
         };
 
         if (isVertex) {
             const unsigned int vertexId = glCreateShader(GL_VERTEX_SHADER);
             compileShader(vertexId);
+
             return vertexId;
         } else {
             const unsigned int fragmentId = glCreateShader(GL_FRAGMENT_SHADER);
             compileShader(fragmentId);
+
             return fragmentId;
         }
     }
 
-    [[nodiscard]] static unsigned int getUniform(const std::string& name, unsigned int program)
+    __NODISCARD static unsigned int getUniform(const std::string& name, unsigned int program)
     {
         return glGetUniformLocation(program, name.c_str());
     }

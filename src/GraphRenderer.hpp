@@ -28,9 +28,9 @@ private:
 
     unsigned int m_defaultShader;
 
-    glm::mat4 m_model;
-    glm::mat4 m_view;
-    glm::mat4 m_proj;
+    glm::mat4 m_model {};
+    glm::mat4 m_view {};
+    glm::mat4 m_proj {};
 
 
     const std::array<double, 9>
@@ -46,27 +46,31 @@ private:
         -0.25f, -0.25f, 0.0f, //a
     };
 
-    glm::mat4 m_scaleMatrix = glm::mat4(1.0f);
+    struct Line {
+        double startX;
+        double startY;
+        double endX;
+        double endY;
+    };
 
-    static void framebufferSizeCallback(int width, int height)
-    {
-        glViewport(0, 0, width, height);
-    }
-
+    struct Point {
+        double x;
+        double y;
+    };
 
 public:
-    GLFWwindow* m_window;
-    Graph*      m_graph;
+    GLFWwindow*            m_window;
+    std::unique_ptr<Graph> m_graph;
 
-    GraphRenderer(Graph* graph);
-    ~GraphRenderer();
-    void      drawTriangle(const std::array<double, 9>& vertices) const;
-    void      handleInput();
-    void      draw();
-    void      drawNode(const double x, const double y);
-    void      drawLine(const double startX, const double startY, const double endX, const double endY) const;
-    glm::vec2 rayCastCoords();
-    glm::vec4 toWorldCoords(glm::vec4 ndcCoords) const;
+    GraphRenderer(std::unique_ptr<Graph> graph);
+    void            cleanup();
+    void            drawTriangle(const std::array<double, 9>& vertices) const;
+    void            handleInput();
+    void            draw();
+    void            drawNode(const Point point);
+    void            drawLine(const Line line) const;
+    const glm::vec2 rayCastCoords() const;
+    glm::vec4       toWorldCoords(glm::vec4 ndcCoords) const;
 };
 
 #endif

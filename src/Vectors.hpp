@@ -1,5 +1,6 @@
 #ifndef VECTORS_H
 #define VECTORS_H
+#define __NODISCARD [[nodiscard]]
 
 #include <array>
 
@@ -16,17 +17,17 @@ struct Vector {
     Vector(Vector&&)             = default;
     Vector& operator=(const Vector&) = default;
 
-    [[nodiscard]] const Type& X() const
+    __NODISCARD const Type& X() const
     {
         return data[0];
     }
 
-    [[nodiscard]] const Type& Y() const
+    __NODISCARD const Type& Y() const
     {
         return data[1];
     }
 
-    [[nodiscard]] const Type& Z() const
+    __NODISCARD const Type& Z() const
     {
         return data[2];
     }

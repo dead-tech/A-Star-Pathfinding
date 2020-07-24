@@ -1,6 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
-
+#define __NODISCARD [[nodiscard]]
 
 #include <stdint.h>
 #include <memory>
@@ -28,25 +28,25 @@ public:
 
     Node()
         : m_nodeCoordinates({ 0.0, 0.0 })
-        , m_walkable(true)
+        , m_walkable { true }
     {
     }
 
     Node(const Vector<double, 2>& coordinates, const bool& walkable)
-        : m_nodeCoordinates(coordinates)
-        , m_walkable(walkable)
+        : m_nodeCoordinates { coordinates }
+        , m_walkable { walkable }
     {
     }
 
-    [[nodiscard]] bool operator==(const Node& rhs) const
+    __NODISCARD const bool operator==(const Node& rhs) const
     {
         return (this->X() == rhs.X() && this->Y() == rhs.Y());
     }
 
-    [[nodiscard]] double X() const { return m_nodeCoordinates.X(); }
-    [[nodiscard]] double Y() const { return m_nodeCoordinates.Y(); }
+    __NODISCARD const double X() const { return m_nodeCoordinates.X(); }
+    __NODISCARD const double Y() const { return m_nodeCoordinates.Y(); }
 
-    [[nodiscard]] bool isWalkable() const { return m_walkable; }
+    __NODISCARD const bool isWalkable() const { return m_walkable; }
 
 
 private:
