@@ -46,11 +46,15 @@ private:
         -0.25f, -0.25f, 0.0f, //a
     };
 
+    /** 
+     * Line struct.
+     * Contains coordinates for creating a line between two nodes.
+     */
     struct Line {
-        double startX;
-        double startY;
-        double endX;
-        double endY;
+        double startX; /**< Starting point on the x axis. */
+        double startY; /**< Starting point on the y axis. */
+        double endX;   /**< Ending point on the x axis. */
+        double endY;   /**< Ending point on the y axis. */
     };
 
     struct Point {
@@ -63,11 +67,17 @@ public:
     std::unique_ptr<Graph> m_graph;
 
     GraphRenderer(std::unique_ptr<Graph> graph);
-    void            cleanup();
-    void            drawTriangle(const std::array<double, 9>& vertices) const;
-    void            handleInput();
-    void            draw();
-    void            drawNode(const Point point);
+    void cleanup();
+    void drawTriangle(const std::array<double, 9>& vertices) const;
+    void handleInput();
+    void draw();
+    void drawNode(const Point point);
+    /**
+       * Draws a line between two nodes, whose coordinates are specified in the Line struct.
+       * @param line struct containing coordinates.
+       * @see Line
+       * @return void
+    */
     void            drawLine(const Line line) const;
     const glm::vec2 rayCastCoords() const;
     glm::vec4       toWorldCoords(glm::vec4 ndcCoords) const;
