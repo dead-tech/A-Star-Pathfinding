@@ -7,50 +7,86 @@
 
 #include "Vectors.hpp"
 
-
-/*
-    The idea here is that for each node we need to calculate
-    m_gScore, m_heuristic and m_fScore starting from the starting
-    node and continuing following the path of the nodes with
-    the lowest m_fScore.
-
-    Tip: Usually as regards the cost of the movements is used 14
-    for diagonal movements and 10 for up, down, left and right ones.
-*/
-
+/**
+ * @brief Node Class which is fundamental for the purpose of this project.
+ * 
+ */
 class Node {
 public:
-    //int32_t m_gScore    = 0; // The distance from the starting node.
-    //int32_t m_heuristic = 0; // The distance from the end node.
-    //int32_t m_fScore    = 0; // The sum of m_gScore and m_heuristic.
-    bool m_isEndNode   = false;
+    /**
+     * @brief Used to check if the node is an endNode.
+     * 
+     */
+    bool m_isEndNode = false;
+    /**
+     * @brief Used to check if the node is a startNode.
+     * 
+     */
     bool m_isStartNode = false;
 
+    /**
+     * @brief Construct a new Node object with default values, 0.0, 0.0 for y m_nodeCoordinates and true for m_walkable. 
+     * @see m_nodeCoordinates
+     * @see m_walkable
+     */
     Node()
         : m_nodeCoordinates({ 0.0, 0.0 })
         , m_walkable { true }
     {
     }
 
+    /**
+     * @brief Construct a new Node object from a coordinates param and a walkable param
+     * 
+     * @param coordinates This is were the node is located in space, represented with a Vector<double, 2> (m_nodeCoordinates).
+     * @param walkable This represent whether the node is an obstacle or can be walked on (m_walkable).
+     */
     Node(const Vector<double, 2>& coordinates, const bool& walkable)
         : m_nodeCoordinates { coordinates }
         , m_walkable { walkable }
     {
     }
 
+    /**
+     * @brief Compares two nodes based on m_nodeCoordinates x's and y's properties.
+     * 
+     * @param rhs The second node to make the comparison with.
+     * @return Returns true if the nodes x and y coords are equal, false if they're not.
+     */
     __NODISCARD const bool operator==(const Node& rhs) const
     {
         return (this->X() == rhs.X() && this->Y() == rhs.Y());
     }
 
+    /**
+     * @see m_nodeCoordinates
+     * @return Node's x position in space.
+     */
     __NODISCARD const double X() const { return m_nodeCoordinates.X(); }
+    /**
+     * 
+     * @see m_nodeCoordinates
+     * @return Node's y position in space.
+     */
     __NODISCARD const double Y() const { return m_nodeCoordinates.Y(); }
 
+    /**
+     * @see m_walkable
+     * @return m_walkable
+     */
     __NODISCARD const bool isWalkable() const { return m_walkable; }
 
 
 private:
-    const Vector<double, 2> m_nodeCoordinates; // This represents where the node is located in the grid.
-    const bool              m_walkable;
+    /**
+     * @brief Represents where the node is located in space with x, y coordinates.
+     * @see Vector
+     */
+    const Vector<double, 2> m_nodeCoordinates;
+    /**
+     * @brief Defines whether a node is an obstacle or not.
+     * 
+     */
+    const bool m_walkable;
 };
 #endif
