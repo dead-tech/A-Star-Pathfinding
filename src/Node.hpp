@@ -2,8 +2,6 @@
 #define NODE_H
 #define __NODISCARD [[nodiscard]]
 
-#include <stdint.h>
-#include <memory>
 
 #include "Vectors.hpp"
 
@@ -13,25 +11,16 @@
  */
 class Node {
 public:
-    /**
-     * @brief Used to check if the node is an endNode.
-     * 
-     */
-    bool m_isEndNode = false;
-    /**
-     * @brief Used to check if the node is a startNode.
-     * 
-     */
-    bool m_isStartNode = false;
+    bool walkable;
 
     /**
-     * @brief Construct a new Node object with default values, 0.0, 0.0 for y m_nodeCoordinates and true for m_walkable. 
+     * @brief Construct a new Node object with default values, 0.0, 0.0 for y m_nodeCoordinates and true for m_walkable.
      * @see m_nodeCoordinates
      * @see m_walkable
      */
     Node()
         : m_nodeCoordinates({ 0.0, 0.0 })
-        , m_walkable { true }
+        , walkable { true }
     {
     }
 
@@ -41,11 +30,12 @@ public:
      * @param coordinates This is were the node is located in space, represented with a Vector<double, 2> (m_nodeCoordinates).
      * @param walkable This represent whether the node is an obstacle or can be walked on (m_walkable).
      */
-    Node(const Vector<double, 2>& coordinates, const bool& walkable)
+    Node(const Vector<double, 2>& coordinates, const bool& walkable_)
         : m_nodeCoordinates { coordinates }
-        , m_walkable { walkable }
+        , walkable { walkable_ }
     {
     }
+
 
     /**
      * @brief Compares two nodes based on m_nodeCoordinates x's and y's properties.
@@ -55,26 +45,10 @@ public:
      */
     __NODISCARD const bool operator==(const Node& rhs) const
     {
-        return (this->X() == rhs.X() && this->Y() == rhs.Y());
+        return m_nodeCoordinates == rhs.getCoords();
     }
 
-    /**
-     * @see m_nodeCoordinates
-     * @return Node's x position in space.
-     */
-    __NODISCARD const double X() const { return m_nodeCoordinates.X(); }
-    /**
-     * 
-     * @see m_nodeCoordinates
-     * @return Node's y position in space.
-     */
-    __NODISCARD const double Y() const { return m_nodeCoordinates.Y(); }
-
-    /**
-     * @see m_walkable
-     * @return m_walkable
-     */
-    __NODISCARD const bool isWalkable() const { return m_walkable; }
+    __NODISCARD const Vector<double, 2> getCoords() const { return m_nodeCoordinates; }
 
 
 private:
@@ -83,10 +57,18 @@ private:
      * @see Vector
      */
     const Vector<double, 2> m_nodeCoordinates;
-    /**
-     * @brief Defines whether a node is an obstacle or not.
-     * 
-     */
-    const bool m_walkable;
 };
+
+namespace std {
+
+template <>
+struct hash<Node> {
+    std::size_t operator()(const Node& n) const
+    {
+        return ((hash<Vector<double, 2>>()(n.getCoords())) ^ (hash<bool>()(n.walkable) << 1));
+    }
+};
+
+}
+
 #endif

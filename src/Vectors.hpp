@@ -9,8 +9,13 @@
  * @tparam Type The type of the elements in the Vector
  * @tparam size The maximum size of the Vector
  */
+
 template <typename Type, std::size_t size>
 struct Vector {
+
+    Type x;
+    Type y;
+    Type z;
 
     /**
      * @brief Variadic templated constructor that accepts at least one parameter.
@@ -22,58 +27,24 @@ struct Vector {
     Vector(Args... args)
         : data { args... }
     {
+        x = data[0];
+        y = data[1];
+        if (size > 2) {
+            z = data[2];
+        }
+        z = 0;
     }
 
-    /**
-     * @brief Copy constructor is defaulted.
-     * 
-     * @param vector Vector to be copied.
-     */
-    Vector(const Vector& vector) = default;
-    /**
-     * @brief Move constructor is defaulted.
-     * 
-     * @param vector Vector to be moved.
-     */
-    Vector(Vector vector&&) = default;
-    /**
-     * @brief Assignment operator is defaulted.
-     * 
-     * @return Vector& a reference to the assigned Vector. 
-     */
-    Vector& operator=(const Vector&) = default;
-
-    /**
-     * @brief Returns the X coordinate of the Vector which is esentially the fist element in the Vector.
-     * 
-     * @see data
-     * @return First element of the Vector. 
-     */
-    __NODISCARD const Type& X() const
+    __NODISCARD const bool operator==(const Vector<Type, 2> rhs) const
     {
-        return data[0];
+        /* bool res = (x == rhs.x) && (y == rhs.y);
+        return size == 3 ? res && (z = rhs.z) : res;*/
+        return (x == rhs.x) && (y == rhs.y);
     }
 
-    /**
-     * @brief Returns the Y coordinate of the Vector which is esentially the secondo element in the Vector.
-     *
-     * @see data 
-     * @return Second element of the Vector.
-     */
-    __NODISCARD const Type& Y() const
+    __NODISCARD const bool operator==(const Vector<Type, 3> rhs) const
     {
-        return data[1];
-    }
-
-    /**
-     * @brief Returns the Z coordinate of the Vector which is esentially the third element in the Vector.
-     * 
-     * @see data
-     * @return Third element of the Vector.
-     */
-    __NODISCARD const Type& Z() const
-    {
-        return data[2];
+        return (x == rhs.x) && (y == rhs.y) && (z == rhs.z);
     }
 
 private:
@@ -85,5 +56,17 @@ private:
      */
     std::array<Type, size> data;
 };
+
+namespace std {
+
+template <>
+struct hash<Vector<double, 2>> {
+    std::size_t operator()(const Vector<double, 2>& coords) const
+    {
+        return ((hash<double>()(coords.x)) ^ (hash<double>()(coords.y) << 1));
+    }
+};
+
+}
 
 #endif

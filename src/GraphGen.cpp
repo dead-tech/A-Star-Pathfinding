@@ -2,100 +2,52 @@
 
 Graph::Graph(const std::size_t graphWidth)
 {
-    m_graphNodes = std::vector<Node>();
-    m_graphNodes.reserve(graphWidth * graphWidth);
+    m_graphNodes = std::unordered_map<Vector<double, 2>, std::shared_ptr<Node>>();
 
     for (std::size_t i = 0; i < graphWidth; ++i) {
         for (std::size_t j = 0; j < graphWidth; ++j) {
-
-            const Vector<double, 2> nodeCoords = { static_cast<double>(i), static_cast<double>(j) };
-            const Node              node { nodeCoords, true };
-
-            m_graphNodes.push_back(node);
+            double x = static_cast<double>(i);
+            double y = static_cast<double>(j);
+            auto   p = std::make_shared<Node>(std::move(Node { { x, y }, true }));
+            m_graphNodes.emplace(Vector<double, 2> { x, y }, std::move(p));
         }
     }
 
-    srand(static_cast<unsigned int>(time(NULL)));
+    std::random_device rd;
 
-    m_graphRepr = std::unordered_map<Node*, std::vector<Edge>>();
+    std::mt19937                           generator(rd());
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-    std::vector<Node> neighbours;
+    m_graphRepr = std::unordered_map<std::shared_ptr<Node>, std::vector<Edge>>();
+
     std::vector<Edge> edges;
 
-    for (std::size_t i = 0; i < m_graphNodes.size(); i++) {
-        auto createEdges = [&](const auto node) {
-            const double randValue = static_cast<double>(rand()) / RAND_MAX;
-            if (randValue > m_createEdgeTreshold) {
-                edges.push_back(Edge(m_graphNodes[i], node));
+    auto createEdgesFor = [&](const auto node) {
+        for (const auto coord : neighbours(node)) {
+            if (distribution(generator) > m_createEdgeThreshold) {
+                if (m_graphNodes.contains(coord))
+                    edges.push_back(Edge(node, m_graphNodes[coord]));
             }
-        };
+        }
+    };
 
-        auto findNeighbours = [&](const auto node) {
-            if (((std::abs(node.X() - m_graphNodes[i].X()) == 1 && node.Y() == m_graphNodes[i].Y()) || (std::abs(node.Y() - m_graphNodes[i].Y()) == 1 && node.X() == m_graphNodes[i].X())) && !(node == m_graphNodes[i])) {
-                neighbours.push_back(node);
-            }
-        };
-
-        std::for_each(begin(m_graphNodes), end(m_graphNodes), findNeighbours);
-
-        std::for_each(begin(neighbours), end(neighbours), createEdges);
-
-        m_graphRepr.insert({ &m_graphNodes[i], edges });
-
-        neighbours.clear();
+    for (const auto [coords, node] : m_graphNodes) {
+        createEdgesFor(node);
+        m_graphRepr.emplace(node, edges); // ?
         edges.clear();
     }
 }
 
-__NODISCARD Node* Graph::findNode(float x, float y) const
+__NODISCARD const std::vector<Vector<double, 2>> Graph::neighbours(const std::shared_ptr<Node> node) const
 {
-    for (auto [node, edges] : m_graphRepr) {
-        const auto resultX = std::abs(x - node->X());
-        const auto resultY = std::abs(y - node->Y());
+    std::vector<Vector<double, 2>> neighbours;
 
-        if ((resultX >= 0 && resultX < 0.25) && (resultY >= 0 && resultY < 0.25)) {
-            return node;
-        }
-    }
+    const auto nodeCoords = node->getCoords();
 
-    return nullptr;
-}
+    neighbours.push_back({ nodeCoords.x + 1.0, nodeCoords.y });
+    neighbours.push_back({ nodeCoords.x, nodeCoords.y + 1.0 });
+    neighbours.push_back({ nodeCoords.x - 1.0, nodeCoords.y });
+    neighbours.push_back({ nodeCoords.x, nodeCoords.y - 1.0 });
 
-void Graph::setStartNode(float x, float y) const
-{
-
-    auto isStartNode = [&](const std::pair<Node*, std::vector<Edge>> pair) {
-        return pair.first->m_isStartNode;
-    };
-
-    const auto match = std::find_if(begin(m_graphRepr), end(m_graphRepr), isStartNode);
-
-    if (match != m_graphRepr.end()) {
-        match->first->m_isStartNode = false;
-    }
-
-    auto node = findNode(x, y);
-    if (node != nullptr) {
-        node->m_isEndNode   = false;
-        node->m_isStartNode = true;
-    }
-}
-
-void Graph::setEndNode(float x, float y) const
-{
-    auto isEndNode = [&](const std::pair<Node*, std::vector<Edge>> pair) {
-        return pair.first->m_isEndNode;
-    };
-
-    const auto match = std::find_if(begin(m_graphRepr), end(m_graphRepr), isEndNode);
-
-    if (match != m_graphRepr.end()) {
-        match->first->m_isEndNode = false;
-    }
-
-    auto node = findNode(x, y);
-    if (node != nullptr) {
-        node->m_isStartNode = false;
-        node->m_isEndNode   = true;
-    }
+    return neighbours;
 }

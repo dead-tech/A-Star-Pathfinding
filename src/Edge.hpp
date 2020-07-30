@@ -2,6 +2,8 @@
 #define EDGE_H
 #include "Node.hpp"
 
+#include <memory>
+
 #define __NODISCARD [[nodiscard]]
 
 /**
@@ -11,14 +13,25 @@
 class Edge {
 public:
     /**
+     * @brief The node from where the Edge will start. 
+     * 
+     */
+    std::shared_ptr<Node> fromNode;
+    /**
+     * @brief The node where the Edge will end up.
+     * 
+     */
+    std::shared_ptr<Node> toNode;
+
+    /**
      * @brief Construct a new Edge object with no specified m_fromNode and m_toNode, constructs them in place with default values.
      * 
      * @see m_fromNode
      * @see m_toNode
      */
     Edge()
-        : m_fromNode(Node {})
-        , m_toNode(Node {})
+        : fromNode(std::shared_ptr<Node>())
+        , toNode(std::shared_ptr<Node>())
     {
     }
 
@@ -28,40 +41,13 @@ public:
      * @param fromNode The node from where the Edge will start.
      * @param toNode The node where the Edge will end up.
      * 
-     * @see m_fromNode
-     * @see m_toNode
+     * @see fromNode
+     * @see toNode
      */
-    Edge(const Node fromNode, const Node toNode)
-        : m_fromNode { fromNode }
-        , m_toNode { toNode }
+    Edge(const std::shared_ptr<Node> from, const std::shared_ptr<Node> to)
+        : fromNode(from)
+        , toNode(to)
     {
     }
-
-    /**
-     * @brief Get the start node of the edge.
-     * 
-     * @see m_fromNode.
-     * @return m_fromNode.
-     */
-    __NODISCARD const Node getFromNode() const { return m_fromNode; }
-    /**
-     * @brief Get the end node of the edge.
-     * 
-     * @see m_toNode.
-     * @return m_toNode.
-     */
-    __NODISCARD const Node getToNode() const { return m_toNode; }
-
-private:
-    /**
-     * @brief The node from where the Edge will start. 
-     * 
-     */
-    Node m_fromNode;
-    /**
-     * @brief The node where the Edge will end up.
-     * 
-     */
-    Node m_toNode;
 };
 #endif
